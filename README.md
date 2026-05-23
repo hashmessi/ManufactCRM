@@ -2,6 +2,18 @@
 
 A full-stack MERN CRM that gives Business Development Associate (BDA) teams in manufacturing a single command center for leads, communication, and performance.
 
+## Live Deployment (Add URLs here)
+- **Frontend (Vercel)**: [Deploy URL](https://manufact-crm.vercel.app) *(Update with your actual URL)*
+- **Backend (Render)**: [Backend URL](https://manufact-crm-backend.onrender.com) *(Update with your actual URL)*
+
+## Test Login Credentials
+| Role | Email | Password |
+|---|---|---|
+| **Admin** | `admin@manufact.com` | `admin123` |
+| **Manager** | `manager@manufact.com` | `manager123` |
+| **Associate 1** | `ravi@manufact.com` | `assoc123` |
+| **Associate 2** | `priya@manufact.com` | `assoc123` |
+
 ## Tech Stack
 - **Frontend**: React 18, Vite, Tailwind CSS v4, Zustand v5, React Router v7, Recharts, @dnd-kit (Kanban)
 - **Backend**: Node.js, Express 5.2.x, MongoDB, Mongoose 9.6.x, JWT Authentication
@@ -31,7 +43,7 @@ Create a `.env` file in the `server` directory based on `server/.env.example`.
    npm install
    
    cd ../client
-   npm install
+   npm install --legacy-peer-deps
    ```
 
 2. **Seed the database (Optional but recommended for testing):**
@@ -52,6 +64,35 @@ Create a `.env` file in the `server` directory based on `server/.env.example`.
      npm run dev
      ```
 
+## Production Deployment Guide
+
+### 1. Backend (Render)
+1. Sign in to [Render](https://render.com) and create a new **Web Service**.
+2. Connect your GitHub repository.
+3. Configure the service:
+   - **Root Directory**: `server`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. Add the following **Environment Variables**:
+   - `MONGO_URI`: Your MongoDB Atlas URI.
+   - `JWT_SECRET`: A secure secret string (e.g., `manufact_super_secret_2026`).
+   - `JWT_EXPIRES_IN`: `7d`
+   - `PORT`: `10000` (Render will override this, but good to set a fallback)
+   - `NODE_ENV`: `production`
+   - `CLIENT_URL`: The URL of your Vercel frontend (e.g., `https://your-app.vercel.app`).
+
+### 2. Frontend (Vercel)
+1. Sign in to [Vercel](https://vercel.com) and create a **New Project**.
+2. Connect your GitHub repository.
+3. Configure the project:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `client`
+   - **Build Command**: `vite build`
+   - **Output Directory**: `dist`
+4. Add the following **Environment Variable**:
+   - `VITE_API_URL`: The URL of your Render backend API service (e.g., `https://your-service.onrender.com/api`).
+5. Vercel will automatically read `vercel.json` and configure routing redirects so that React Router links load properly on page refreshes.
+
 ## Project Structure
 - `/client`: Vite + React frontend application.
   - `/src/components`: Reusable UI elements, grouped by feature.
@@ -64,3 +105,4 @@ Create a `.env` file in the `server` directory based on `server/.env.example`.
   - `/middleware`: Authentication and validation handlers.
   - `/utils`: Helper functions like the score engine.
   - `/seed`: Database seeding scripts.
+
