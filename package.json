@@ -1,0 +1,15 @@
+{
+  "name": "manufact-crm",
+  "version": "1.0.0",
+  "description": "ManufactCRM — BDA Team Intelligence Platform for Manufacturing Companies",
+  "scripts": {
+    "server": "cd server && node server.js",
+    "client": "cd client && npm run dev",
+    "dev": "npm run server & npm run client",
+    "seed": "cd server && node seed/seedData.js",
+    "install:all": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["crm", "mern", "manufacturing", "sales", "pipeline"],
+  "author": "Hashvanthh",
+  "license": "MIT"
+}

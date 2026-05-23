@@ -1,0 +1,20 @@
+{
+  "name": "manufact-crm-server",
+  "version": "1.0.0",
+  "description": "ManufactCRM API Server — CRM for manufacturing BDA teams",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed/seedData.js"
+  },
+  "dependencies": {
+    "express": "^5.2.0",
+    "mongoose": "^9.6.0",
+    "jsonwebtoken": "^9.0.3",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
+    "express-validator": "^7.3.0"
+  }
+}
