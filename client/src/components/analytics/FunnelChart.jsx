@@ -1,16 +1,21 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-// Custom tooltip for the funnel
 const FunnelTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-bg-secondary border border-border p-3 rounded-lg shadow-xl">
-        <p className="font-medium text-text-primary mb-1">{data.stage}</p>
-        <p className="text-sm text-text-secondary">Leads: <span className="font-semibold text-text-primary">{data.count}</span></p>
+      <div className="bg-bg-secondary border border-border/85 p-3 rounded-xl shadow-premium-soft select-none text-[11px] font-mono">
+        <p className="font-semibold text-text-primary mb-2 border-b border-border/40 pb-1">{data.stage}</p>
+        <p className="flex justify-between items-center gap-6 text-text-muted">
+          <span>Active Leads:</span>
+          <span className="font-bold text-text-primary">{data.count}</span>
+        </p>
         {data.dropoff > 0 && (
-          <p className="text-xs text-accent-danger mt-1">Drop-off: {data.dropoff}%</p>
+          <p className="flex justify-between items-center gap-6 mt-1 text-danger">
+            <span>Drop-off Rate:</span>
+            <span className="font-bold">-{data.dropoff}%</span>
+          </p>
         )}
       </div>
     );
@@ -19,14 +24,14 @@ const FunnelTooltip = ({ active, payload }) => {
 };
 
 export default function FunnelChart({ data = [] }) {
-  // Define colors for stages (cool to warm)
+  // Define highly refined monochrome-to-emerald colors for stages
   const colors = [
-    '#3b82f6', // New - blue
-    '#6366f1', // Contacted - indigo
-    '#8b5cf6', // Qualified - violet
-    '#d946ef', // Proposal - fuchsia
-    '#f59e0b', // Negotiation - amber
-    '#10b981', // Won - green
+    '#94a3b8', // New - slate
+    '#4f8cff', // Contacted - SaaS blue
+    '#7c5cff', // Qualified - SaaS purple
+    '#f59e0b', // Proposal - gold amber
+    '#f97316', // Negotiation - orange
+    '#10b981', // Won - emerald green
   ];
 
   // Process data to calculate drop-offs
@@ -43,12 +48,15 @@ export default function FunnelChart({ data = [] }) {
   });
 
   return (
-    <div className="bg-bg-secondary border border-border rounded-xl p-5 shadow-lg h-full flex flex-col">
-      <h3 className="text-lg font-medium text-text-primary mb-6">Sales Funnel</h3>
+    <div className="bg-bg-secondary/40 border border-border/80 rounded-xl p-5 shadow-premium-card h-full flex flex-col transition-all duration-300">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono">Pipeline Conversion Funnel</h3>
+        <span className="text-[10px] text-text-muted font-mono bg-bg-tertiary px-2 py-0.5 rounded border border-border/40">CONVERSION</span>
+      </div>
       
-      <div className="flex-1 min-h-[300px]">
+      <div className="flex-1 min-h-[280px]">
         {processedData.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-text-secondary">
+          <div className="h-full flex items-center justify-center text-text-muted text-xs font-mono">
             No pipeline data available
           </div>
         ) : (
@@ -56,7 +64,7 @@ export default function FunnelChart({ data = [] }) {
             <BarChart
               data={processedData}
               layout="vertical"
-              margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+              margin={{ top: 10, right: 30, left: 10, bottom: 5 }}
             >
               <XAxis type="number" hide />
               <YAxis 
@@ -64,15 +72,15 @@ export default function FunnelChart({ data = [] }) {
                 dataKey="stage" 
                 axisLine={false} 
                 tickLine={false}
-                tick={{ fill: '#f1f5f9', fontSize: 13, fontWeight: 500 }}
-                width={100}
+                tick={{ fill: '#94a3b8', fontSize: 10, fontFamily: 'monospace' }}
+                width={90}
               />
-              <Tooltip content={<FunnelTooltip />} cursor={{ fill: '#242836' }} />
+              <Tooltip content={<FunnelTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.02)' }} />
               <Bar 
                 dataKey="count" 
-                radius={[0, 4, 4, 0]}
-                barSize={32}
-                label={{ position: 'right', fill: '#94a3b8', fontSize: 12, formatter: (val) => val }}
+                radius={[3, 3, 3, 3]}
+                barSize={16}
+                label={{ position: 'right', fill: '#94a3b8', fontSize: 10, fontFamily: 'monospace', offset: 10 }}
               >
                 {processedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />

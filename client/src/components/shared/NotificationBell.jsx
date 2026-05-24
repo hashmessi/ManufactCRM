@@ -82,7 +82,7 @@ export default function NotificationBell() {
         aria-label="Notifications"
         aria-expanded={isOpen}
       >
-        <FiBell className="w-5 h-5" />
+        <FiBell className={`w-5 h-5 ${unreadCount > 0 ? 'bell-has-unread' : ''}`} />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-danger text-white text-[10px] font-bold px-1 animate-pulse-glow">
             {unreadCount > 99 ? '99+' : unreadCount}

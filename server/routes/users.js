@@ -9,8 +9,23 @@ const router = express.Router();
 router.use(verifyToken);
 
 /**
+ * @route   GET /api/users/assignable
+ * @desc    Return all users for "Assign To" dropdowns — accessible to all authenticated roles.
+ *          Returns only non-sensitive fields: _id, name, email, role.
+ * @access  Private (all roles)
+ */
+router.get('/assignable', async (req, res) => {
+  const users = await User.find()
+    .select('name email role')
+    .sort({ role: 1, name: 1 })
+    .lean();
+
+  res.json({ count: users.length, users });
+});
+
+/**
  * @route   GET /api/users
- * @desc    List all users (admin only)
+ * @desc    List all users (admin only) — full detail including target, manager
  * @access  Private / Admin
  */
 router.get('/', requireRole('admin'), async (req, res) => {

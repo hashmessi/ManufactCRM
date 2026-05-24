@@ -56,7 +56,8 @@ export default function LeadForm({ lead = null, onClose }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await api.get('/users');
+        // /users/assignable is accessible to all authenticated roles
+        const response = await api.get('/users/assignable');
         setUsers(response.data.users || response.data || []);
       } catch (err) {
         setUsers([]);
@@ -77,6 +78,7 @@ export default function LeadForm({ lead = null, onClose }) {
     const newErrors = {};
     if (!form.companyName.trim()) newErrors.companyName = 'Company name is required';
     if (!form.contactPersonName.trim()) newErrors.contactPersonName = 'Contact name is required';
+    if (!form.assignedTo) newErrors.assignedTo = 'Assigned To is required';
     if (form.contactPersonEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactPersonEmail)) {
       newErrors.contactPersonEmail = 'Invalid email format';
     }
@@ -93,19 +95,23 @@ export default function LeadForm({ lead = null, onClose }) {
 
     setLoading(true);
     try {
+      // Build contactPerson — only include non-empty fields so the email
+      // validator is not triggered on blank optional inputs
+      const contactPerson = {};
+      if (form.contactPersonName.trim()) contactPerson.name = form.contactPersonName.trim();
+      if (form.contactPersonEmail.trim()) contactPerson.email = form.contactPersonEmail.trim();
+      if (form.contactPersonPhone.trim()) contactPerson.phone = form.contactPersonPhone.trim();
+      if (form.contactPersonDesignation.trim()) contactPerson.designation = form.contactPersonDesignation.trim();
+
       const payload = {
         companyName: form.companyName.trim(),
-        industry: form.industry,
-        contactPerson: {
-          name: form.contactPersonName.trim(),
-          email: form.contactPersonEmail.trim(),
-          phone: form.contactPersonPhone.trim(),
-          designation: form.contactPersonDesignation.trim(),
-        },
         dealValue: form.dealValue ? Number(form.dealValue) : 0,
-        source: form.source,
-        notes: form.notes.trim(),
       };
+      // Only include optional string fields if non-empty (prevents enum/validator issues)
+      if (form.industry) payload.industry = form.industry;
+      if (form.source) payload.source = form.source;
+      if (form.notes.trim()) payload.notes = form.notes.trim();
+      if (Object.keys(contactPerson).length > 0) payload.contactPerson = contactPerson;
       if (form.assignedTo) payload.assignedTo = form.assignedTo;
       if (form.nextFollowUp) payload.nextFollowUp = form.nextFollowUp;
 
@@ -320,6 +326,9 @@ export default function LeadForm({ lead = null, onClose }) {
                   </option>
                 ))}
               </select>
+              {errors.assignedTo && (
+                <p className="text-xs text-danger mt-1">{errors.assignedTo}</p>
+              )}
             </div>
             <div>
               <label htmlFor="lead-nextFollowUp" className="block text-sm font-medium text-text-muted mb-1">

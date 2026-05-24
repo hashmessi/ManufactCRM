@@ -122,8 +122,18 @@ router.get('/', async (req, res) => {
 router.post(
   '/',
   [
-    body('companyName').notEmpty().withMessage('Company name is required'),
-    body('assignedTo').notEmpty().withMessage('assignedTo is required'),
+    body('companyName').trim().notEmpty().withMessage('Company name is required'),
+    body('assignedTo')
+      .notEmpty()
+      .withMessage('assignedTo is required')
+      .bail()
+      .isMongoId()
+      .withMessage('assignedTo must be a valid user ID'),
+    body('dealValue').optional({ checkFalsy: true }).isNumeric().withMessage('dealValue must be a number'),
+    body('source').optional({ checkFalsy: true }).isString(),
+    body('industry').optional({ checkFalsy: true }).isString(),
+    body('nextFollowUp').optional({ checkFalsy: true }).isISO8601().withMessage('nextFollowUp must be a valid date'),
+    body('contactPerson.email').optional({ checkFalsy: true }).isEmail().withMessage('Invalid contact email'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -131,12 +141,35 @@ router.post(
       return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
     }
 
-    const lead = await Lead.create(req.body);
+    // Sanitize payload — drop empty-string fields so Mongoose enums/defaults apply correctly
+    const allowedFields = [
+      'companyName', 'industry', 'contactPerson', 'dealValue', 'stage',
+      'assignedTo', 'source', 'nextFollowUp', 'proposalSent', 'notes',
+    ];
+    const payload = {};
+    for (const field of allowedFields) {
+      const value = req.body[field];
+      if (value === undefined || value === null) continue;
+      if (typeof value === 'string' && value.trim() === '') continue;
+      payload[field] = value;
+    }
 
-    // Compute initial score
-    const updated = await recomputeAndSaveScore(lead._id);
-    const populated = await Lead.findById(updated._id).populate('assignedTo', 'name email');
+    // Verify assigned user actually exists to avoid orphan references
+    const assignedUser = await User.findById(payload.assignedTo).select('_id');
+    if (!assignedUser) {
+      return res.status(400).json({ message: 'Assigned user does not exist' });
+    }
 
+    const lead = await Lead.create(payload);
+
+    // Compute initial score (best-effort — failure shouldn't break the create)
+    try {
+      await recomputeAndSaveScore(lead._id);
+    } catch (scoreErr) {
+      console.error('Score computation failed for new lead:', scoreErr.message);
+    }
+
+    const populated = await Lead.findById(lead._id).populate('assignedTo', 'name email');
     res.status(201).json(populated);
   }
 );
@@ -176,7 +209,13 @@ router.get(
  */
 router.patch(
   '/:id',
-  [param('id').isMongoId().withMessage('Invalid lead ID')],
+  [
+    param('id').isMongoId().withMessage('Invalid lead ID'),
+    body('assignedTo').optional({ checkFalsy: true }).isMongoId().withMessage('assignedTo must be a valid user ID'),
+    body('dealValue').optional({ checkFalsy: true }).isNumeric().withMessage('dealValue must be a number'),
+    body('nextFollowUp').optional({ checkFalsy: true }).isISO8601().withMessage('nextFollowUp must be a valid date'),
+    body('contactPerson.email').optional({ checkFalsy: true }).isEmail().withMessage('Invalid contact email'),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -189,16 +228,19 @@ router.patch(
     }
 
     // Apply updates (except stage — use /:id/stage for stage transitions)
+    // Skip empty-string values so enum-restricted fields aren't accidentally cleared with invalid values.
     const allowedFields = [
       'companyName', 'industry', 'contactPerson', 'dealValue',
       'assignedTo', 'source', 'nextFollowUp', 'proposalSent', 'notes',
     ];
     for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        lead[field] = req.body[field];
-      }
+      const value = req.body[field];
+      if (value === undefined) continue;
+      if (typeof value === 'string' && value.trim() === '') continue;
+      lead[field] = value;
     }
     await lead.save();
+
 
     // Recompute score after mutation
     const updated = await recomputeAndSaveScore(lead._id);

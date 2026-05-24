@@ -27,7 +27,21 @@ const PIPELINE_STAGES = [
   'Lost',
 ];
 
-const LEAD_SOURCES = ['referral', 'cold_outreach', 'inbound', 'exhibition', 'other'];
+const LEAD_SOURCES = [
+  'referral',
+  'cold_outreach',
+  'inbound',
+  'exhibition',
+  'other',
+  'Website',
+  'Referral',
+  'Cold Call',
+  'Exhibition',
+  'LinkedIn',
+  'IndiaMart',
+  'TradeIndia',
+  'Other'
+];
 
 const leadSchema = new mongoose.Schema(
   {

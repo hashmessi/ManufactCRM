@@ -1,26 +1,80 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router';
+import React, { useEffect, useRef, Suspense, lazy, useState } from 'react';
+import { BrowserRouter, Routes, Route, Outlet, Navigate, useLocation } from 'react-router';
 import { Toaster } from 'react-hot-toast';
 
-import Navbar from './components/shared/Navbar.jsx';
+import Sidebar from './components/shared/Sidebar.jsx';
+import Topbar from './components/shared/Topbar.jsx';
+import AIAssistantDrawer from './components/shared/AIAssistantDrawer.jsx';
 import ProtectedRoute from './components/shared/ProtectedRoute.jsx';
 import RoleGuard from './components/shared/RoleGuard.jsx';
 
-import Login from './pages/Login.jsx';
-import Pipeline from './pages/Pipeline.jsx';
-import LeadDetailPage from './pages/LeadDetailPage.jsx';
-import Analytics from './pages/Analytics.jsx';
-import MyDashboard from './pages/MyDashboard.jsx';
-import Admin from './pages/Admin.jsx';
-import Notifications from './pages/Notifications.jsx';
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Pipeline = lazy(() => import('./pages/Pipeline.jsx'));
+const LeadDetailPage = lazy(() => import('./pages/LeadDetailPage.jsx'));
+const Analytics = lazy(() => import('./pages/Analytics.jsx'));
+const MyDashboard = lazy(() => import('./pages/MyDashboard.jsx'));
+const Admin = lazy(() => import('./pages/Admin.jsx'));
+const Notifications = lazy(() => import('./pages/Notifications.jsx'));
+
+function RouteLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="w-8 h-8 border-4 border-accent/20 border-t-accent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
 function AuthenticatedLayout() {
+  const location = useLocation();
+  const mainRef = useRef(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.style.opacity = '0';
+      mainRef.current.style.transform = 'translateY(8px)';
+      requestAnimationFrame(() => {
+        if (mainRef.current) {
+          mainRef.current.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+          mainRef.current.style.opacity = '1';
+          mainRef.current.style.transform = 'translateY(0)';
+        }
+      });
+    }
+  }, [location.pathname]);
+
   return (
-    <div className="min-h-screen bg-bg-primary">
-      <Navbar />
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-        <Outlet />
-      </main>
+    <div className="min-h-screen bg-bg-primary flex">
+      {/* 1. Left Sidebar Navigation */}
+      <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+
+      {/* 2. Main content container, shifts based on sidebar expand state */}
+      <div 
+        className={`flex-1 min-h-screen flex flex-col transition-all duration-300 ${
+          sidebarCollapsed ? 'pl-16' : 'pl-64'
+        }`}
+      >
+        {/* Top Header Bar */}
+        <Topbar 
+          sidebarCollapsed={sidebarCollapsed} 
+          setSidebarCollapsed={setSidebarCollapsed} 
+          onAIAssistantToggle={() => setAiAssistantOpen(!aiAssistantOpen)} 
+        />
+
+        {/* Content Body */}
+        <main ref={mainRef} className="flex-1 px-8 py-6 overflow-y-auto">
+          <Suspense fallback={<RouteLoader />}>
+            <Outlet />
+          </Suspense>
+        </main>
+      </div>
+
+      {/* 3. Collapsible AI Assistant Panel */}
+      <AIAssistantDrawer 
+        isOpen={aiAssistantOpen} 
+        onClose={() => setAiAssistantOpen(false)} 
+      />
     </div>
   );
 }
@@ -49,7 +103,7 @@ export default function App() {
       />
 
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Suspense fallback={<RouteLoader />}><Login /></Suspense>} />
 
         <Route
           element={

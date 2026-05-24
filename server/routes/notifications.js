@@ -25,6 +25,20 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * @route   PATCH /api/notifications/read-all
+ * @desc    Mark all notifications as read for the current user
+ * @access  Private
+ */
+router.patch('/read-all', async (req, res) => {
+  await Notification.updateMany(
+    { user: req.user._id, read: false },
+    { $set: { read: true } }
+  );
+
+  res.json({ message: 'All notifications marked as read' });
+});
+
+/**
  * @route   PATCH /api/notifications/:id/read
  * @desc    Mark notification as read
  * @access  Private
@@ -43,20 +57,6 @@ router.patch('/:id/read', async (req, res) => {
   await notification.save();
 
   res.json({ message: 'Notification marked as read', notification });
-});
-
-/**
- * @route   PATCH /api/notifications/read-all
- * @desc    Mark all notifications as read for the current user
- * @access  Private
- */
-router.patch('/read-all', async (req, res) => {
-  await Notification.updateMany(
-    { user: req.user._id, read: false },
-    { $set: { read: true } }
-  );
-
-  res.json({ message: 'All notifications marked as read' });
 });
 
 module.exports = router;

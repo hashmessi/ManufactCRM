@@ -16,8 +16,7 @@ export default function LeadDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = React.useCallback(async () => {
     try {
       await fetchLeadById(id);
       const res = await api.get(`/interactions?leadId=${id}`);
@@ -28,12 +27,14 @@ export default function LeadDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, fetchLeadById, navigate]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true);
     loadData();
     return () => clearSelectedLead();
-  }, [id]);
+  }, [loadData, clearSelectedLead]);
 
   const handleInteractionLogged = () => {
     loadData(); // reload lead and interactions to update scores etc.
