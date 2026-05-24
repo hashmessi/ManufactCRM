@@ -59,6 +59,12 @@ export default function LeadCard({ lead, isOverlay = false }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    ...(isOverlay && {
+      transform: `${CSS.Transform.toString(transform)} scale(1.05) rotate(2deg)`,
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.5)',
+      zIndex: 50,
+      cursor: 'grabbing',
+    })
   };
 
   const daysInStage = getDaysInStage(lead.stageChangedAt);
@@ -77,9 +83,9 @@ export default function LeadCard({ lead, isOverlay = false }) {
       <div
         ref={setNodeRef}
         style={style}
-        className={`bg-bg-secondary border border-border/80 rounded-xl p-4 cursor-grab active:cursor-grabbing transition-all duration-300 shadow-premium-card perspective-card group ${
-          isDragging ? 'opacity-50 border-accent/80' : ''
-        }`}
+        className={`bg-bg-secondary/80 backdrop-blur-sm border border-border/80 rounded-xl p-4 cursor-grab active:cursor-grabbing transition-all duration-300 shadow-premium-card perspective-card group hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.25)] hover:border-accent/40 ${
+          isDragging ? 'opacity-40 scale-95 border-accent/80' : ''
+        } ${isOverlay ? 'opacity-100 bg-bg-secondary/95 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border-accent' : ''}`}
         onClick={handleClick}
         id={`lead-card-${lead._id}`}
         role="button"

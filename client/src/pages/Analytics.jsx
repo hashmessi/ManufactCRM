@@ -142,15 +142,15 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="animate-pulse space-y-6">
+      <div className="space-y-6 animate-fadeIn">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => <div key={i} className="h-32 bg-bg-tertiary/40 rounded-xl border border-border/60"></div>)}
+          {[1,2,3,4].map(i => <div key={i} className="h-36 skeleton border border-border/40"></div>)}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="h-80 bg-bg-tertiary/40 rounded-xl border border-border/60"></div>
-          <div className="h-80 bg-bg-tertiary/40 rounded-xl border border-border/60"></div>
+          <div className="h-[340px] skeleton border border-border/40"></div>
+          <div className="h-[340px] skeleton border border-border/40"></div>
         </div>
-        <div className="h-96 bg-bg-tertiary/40 rounded-xl border border-border/60"></div>
+        <div className="h-96 skeleton border border-border/40"></div>
       </div>
     );
   }
@@ -170,18 +170,24 @@ export default function Analytics() {
       {/* KPI Cards — Overhauled to flat spatial BI style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiCards.map((kpi) => (
-          <div key={kpi.label} className="perspective-container">
-            <div className="bg-bg-secondary/40 border border-border/80 rounded-xl p-5 shadow-premium-card perspective-card flex flex-col justify-between relative overflow-hidden h-36">
+          <div key={kpi.label} className="perspective-container group">
+            <div className="bg-bg-secondary/40 backdrop-blur-md border border-border/80 rounded-xl p-5 shadow-premium-card perspective-card flex flex-col justify-between relative overflow-hidden h-36 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
+              {/* Subtle ambient gradient based on accent color */}
+              <div 
+                className="absolute inset-0 opacity-5 pointer-events-none transition-opacity duration-300 group-hover:opacity-10"
+                style={{ background: `linear-gradient(135deg, transparent 40%, ${kpi.color} 100%)` }}
+              />
+
               {/* Top row */}
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between relative z-10">
                 <span className="text-[10px] font-semibold text-text-muted font-mono uppercase tracking-wider">
                   {kpi.label}
                 </span>
                 <div className="flex items-center gap-2">
                   <TrendIndicator value={kpi.trend} />
                   <div 
-                    className="w-6 h-6 rounded-lg bg-bg-tertiary border border-border/85 flex items-center justify-center shrink-0"
-                    style={{ color: kpi.color }}
+                    className="w-6 h-6 rounded-lg bg-bg-tertiary border border-border/85 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
+                    style={{ color: kpi.color, boxShadow: `0 0 10px ${kpi.color}20` }}
                   >
                     {kpi.icon}
                   </div>

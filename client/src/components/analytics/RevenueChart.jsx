@@ -29,7 +29,7 @@ export default function RevenueChart({ data = [] }) {
   }));
 
   return (
-    <div className="bg-bg-secondary/40 border border-border/80 rounded-xl p-5 shadow-premium-card h-full flex flex-col transition-all duration-300">
+    <div className="bg-bg-secondary/40 backdrop-blur-md border border-border/80 rounded-xl p-5 shadow-premium-card h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono">Revenue Performance vs Target</h3>
         <span className="text-[10px] text-text-muted font-mono bg-bg-tertiary px-2 py-0.5 rounded border border-border/40">MONTHLY VIEWS</span>
@@ -47,7 +47,21 @@ export default function RevenueChart({ data = [] }) {
               margin={{ top: 10, right: 10, left: 10, bottom: 5 }}
               barGap={6}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.03)" vertical={false} />
+              <defs>
+                <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={1}/>
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.6}/>
+                </linearGradient>
+                <linearGradient id="colorWarning" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#4f8cff" stopOpacity={1}/>
+                  <stop offset="95%" stopColor="#4f8cff" stopOpacity={0.6}/>
+                </linearGradient>
+                <linearGradient id="colorDanger" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={1}/>
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.6}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.02)" vertical={false} />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
@@ -74,11 +88,14 @@ export default function RevenueChart({ data = [] }) {
                 name="Actual Revenue" 
                 radius={[3, 3, 0, 0]}
                 barSize={16}
+                isAnimationActive={true}
+                animationDuration={1200}
+                animationEasing="ease-out"
               >
                 {chartData.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
-                    fill={entry.percent >= 100 ? '#10b981' : entry.percent >= 60 ? '#4f8cff' : '#ef4444'} 
+                    fill={entry.percent >= 100 ? 'url(#colorSuccess)' : entry.percent >= 60 ? 'url(#colorWarning)' : 'url(#colorDanger)'} 
                   />
                 ))}
               </Bar>
@@ -88,6 +105,9 @@ export default function RevenueChart({ data = [] }) {
                 fill="rgba(255, 255, 255, 0.08)" 
                 radius={[3, 3, 0, 0]}
                 barSize={16}
+                isAnimationActive={true}
+                animationDuration={1200}
+                animationEasing="ease-out"
               />
             </BarChart>
           </ResponsiveContainer>

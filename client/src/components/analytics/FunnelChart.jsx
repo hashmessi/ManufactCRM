@@ -26,12 +26,12 @@ const FunnelTooltip = ({ active, payload }) => {
 export default function FunnelChart({ data = [] }) {
   // Define highly refined monochrome-to-emerald colors for stages
   const colors = [
-    '#94a3b8', // New - slate
-    '#4f8cff', // Contacted - SaaS blue
-    '#7c5cff', // Qualified - SaaS purple
-    '#f59e0b', // Proposal - gold amber
-    '#f97316', // Negotiation - orange
-    '#10b981', // Won - emerald green
+    { id: 'grad-0', color: '#94a3b8' }, // New - slate
+    { id: 'grad-1', color: '#4f8cff' }, // Contacted - SaaS blue
+    { id: 'grad-2', color: '#7c5cff' }, // Qualified - SaaS purple
+    { id: 'grad-3', color: '#f59e0b' }, // Proposal - gold amber
+    { id: 'grad-4', color: '#f97316' }, // Negotiation - orange
+    { id: 'grad-5', color: '#10b981' }, // Won - emerald green
   ];
 
   // Process data to calculate drop-offs
@@ -43,12 +43,12 @@ export default function FunnelChart({ data = [] }) {
     return {
       ...item,
       dropoff,
-      fill: colors[index % colors.length]
+      fillUrl: `url(#${colors[index % colors.length].id})`
     };
   });
 
   return (
-    <div className="bg-bg-secondary/40 border border-border/80 rounded-xl p-5 shadow-premium-card h-full flex flex-col transition-all duration-300">
+    <div className="bg-bg-secondary/40 backdrop-blur-md border border-border/80 rounded-xl p-5 shadow-premium-card h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono">Pipeline Conversion Funnel</h3>
         <span className="text-[10px] text-text-muted font-mono bg-bg-tertiary px-2 py-0.5 rounded border border-border/40">CONVERSION</span>
@@ -66,6 +66,14 @@ export default function FunnelChart({ data = [] }) {
               layout="vertical"
               margin={{ top: 10, right: 30, left: 10, bottom: 5 }}
             >
+              <defs>
+                {colors.map((c) => (
+                  <linearGradient key={c.id} id={c.id} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="5%" stopColor={c.color} stopOpacity={0.7}/>
+                    <stop offset="95%" stopColor={c.color} stopOpacity={1}/>
+                  </linearGradient>
+                ))}
+              </defs>
               <XAxis type="number" hide />
               <YAxis 
                 type="category" 
@@ -81,9 +89,12 @@ export default function FunnelChart({ data = [] }) {
                 radius={[3, 3, 3, 3]}
                 barSize={16}
                 label={{ position: 'right', fill: '#94a3b8', fontSize: 10, fontFamily: 'monospace', offset: 10 }}
+                isAnimationActive={true}
+                animationDuration={1200}
+                animationEasing="ease-out"
               >
                 {processedData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                  <Cell key={`cell-${index}`} fill={entry.fillUrl} />
                 ))}
               </Bar>
             </BarChart>
