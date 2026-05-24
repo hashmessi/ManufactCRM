@@ -138,6 +138,16 @@ Route Handler
 JSON Response → React State (Zustand) → UI Update
 ```
 
+## 🔐 Test Login Credentials
+
+Use the following test credentials to explore the different role-based views of the application:
+
+| Role | Email | Password | Access Level |
+|---|---|---|---|
+| **Admin** | `admin@manufact.com` | `admin123` | Full access, user management, global analytics |
+| **Manager** | `manager@manufact.com` | `manager123` | Team oversight, team analytics, assign leads |
+| **Associate 1** | `ravi@manufact.com` | `assoc123` | Pipeline execution, log interactions |
+| **Associate 2** | `priya@manufact.com` | `assoc123` | Pipeline execution, log interactions |
 ---
 
 ## ✨ Features
