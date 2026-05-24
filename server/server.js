@@ -40,8 +40,13 @@ app.use('/api/reminders', require('./routes/reminders'));
 app.use('/api/notifications', require('./routes/notifications'));
 
 /* ------------------------------------------------------------------ */
-/*  Health check                                                      */
+/*  Root & Health check                                               */
 /* ------------------------------------------------------------------ */
+
+app.get('/', (req, res) => {
+  res.send('ManufactCRM API is running. Please use /api endpoints.');
+});
+
 
 app.get('/api/health', (req, res) => {
   res.json({
