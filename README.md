@@ -5,8 +5,8 @@ A full-stack, production-ready MERN CRM that provides Business Development Assoc
 ![ManufactCRM Pipeline](https://via.placeholder.com/1200x600?text=ManufactCRM+Dashboard)
 
 ## 🚀 Live Deployment
-- **Frontend (Vercel)**: [ManufactCRM App](https://manufact-crm.vercel.app) *(Update with actual URL once deployed)*
-- **Backend (Render)**: [ManufactCRM API](https://manufact-crm-backend.onrender.com) *(Update with actual URL once deployed)*
+- **Frontend (Vercel)**:https://manufact-crm-wine.vercel.app
+- **Backend (Render)**:https://manufactcrm.onrender.com/
 
 ## 🔐 Test Login Credentials
 
